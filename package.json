@@ -1,0 +1,23 @@
+{
+  "name": "react-jss-theme",
+  "version": "1.0.0",
+  "description": "React JSS theme provider",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/SerjoPepper/react-jss-theme.git"
+  },
+  "keywords": [
+    "react",
+    "jss"
+  ],
+  "author": "Sergey Pereskokov serjopepper@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SerjoPepper/react-jss-theme/issues"
+  },
+  "homepage": "https://github.com/SerjoPepper/react-jss-theme#readme"
+}
