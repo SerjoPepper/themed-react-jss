@@ -6,16 +6,45 @@ export function create(provider) {
 
   return function injectSheet(styles, jssOptions = {}) {
 
-    return function wrap(WrappedComponent) {
+    function getResultStyles(data) {
+      if (typeof styles === 'function')
+        return styles(data)
+      return styles
+    }
 
-      function getResultStyles(data) {
-        if (typeof styles === 'function')
-          return styles(data)
-        return styles
+    function createSheet(themeData) {
+      return provider.jss.createStyleSheet(getResultStyles(themeData), jssOptions)
+    }
+
+    return function decorate(WrappedComponent) {
+
+      function attachSheetOnce(themeData) {
+        if (sheets.has(themeData)) {
+          const info = sheets.get(themeData)
+          if (!info.refs) {
+            info.refs = 1
+            info.sheet.attach()
+          } else {
+            info.refs += 1
+          }
+        } else {
+          const info = {}
+          info.refs = 1
+          info.sheet = createSheet(themeData)
+          info.sheet.attach()
+          sheets.set(themeData, info)
+        }
+      }
+
+      function detachSheetOnce(themeData) {
+        const info = sheets.get(themeData)
+        info.refs -= 1
+        if (!info.refs)
+          info.sheet.detach()
       }
 
       const emptyThemeData = {}
-      const sheets = new WeakMap
+      const sheets = new WeakMap()
       const displayName =
         WrappedComponent.displayName ||
         WrappedComponent.name ||
@@ -25,8 +54,8 @@ export function create(provider) {
         jssOptions.meta = displayName
 
       class Jss extends Component {
-        static wrapped = WrappedComponent;
-        static displayName = `Jss(${displayName})`;
+        static wrapped = WrappedComponent
+        static displayName = `Jss(${displayName})`
         static contextTypes = {
           [contextFieldName]: PropTypes.object
         }
@@ -36,47 +65,16 @@ export function create(provider) {
         }
 
         getThemeData(context = this.context) {
-          const { themeData = emptyThemeData } = (this.context[contextFieldName] || {})
+          const { themeData = emptyThemeData } = (context[contextFieldName] || {})
           return themeData
         }
 
-        createSheet(themeData) {
-          return jss.createStyleSheet(getResultStyles(themeData), jssOptions)
-        }
-
-        attachSheetOnce(themeData) {
-          if (sheets.has(themeData)) {
-            const info = sheets.get(themeData)
-            if (!info.refs) {
-              info.refs = 1
-              info.sheet.attach()
-            } else {
-              info.refs += 1
-            }
-          } else {
-            const info = {}
-            info.refs = 1
-            info.sheet = this.createSheet(themeData)
-            info.sheet.attach()
-            sheets.set(themeData, info)
-          }
-        }
-
-        detachSheetOnce(themeData) {
-          const info = sheets.get(themeData)
-          info.refs -= 1
-          if (!info.refs) {
-            info.sheet.detach()
-          }
-        }
-
         componentWillMount() {
-          this.attachSheetOnce(this.getThemeData())
-
+          attachSheetOnce(this.getThemeData())
         }
 
         componentWillUnmount() {
-          this.detachSheetOnce(this.getThemeData())
+          detachSheetOnce(this.getThemeData())
         }
 
         componentWillUpdate(nextProps, nextState, nextContext) {
@@ -84,8 +82,8 @@ export function create(provider) {
           const nextThemeData = this.getThemeData(nextContext)
           if (themeData === nextThemeData)
             return
-          this.detachSheetOnce(themeData)
-          this.attachSheetOnce(nextThemeData)
+          detachSheetOnce(themeData)
+          attachSheetOnce(nextThemeData)
         }
 
         render() {

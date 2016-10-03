@@ -1,8 +1,8 @@
+import preset from 'jss-preset-default'
+import merge from 'lodash/merge'
 import { create as createJss } from 'jss'
 import { create as createApplyTheme } from './ApplyTheme'
 import { create as createInjectSheet } from './injectSheet'
-import preset from 'jss-preset-default'
-import merge from 'lodash/merge'
 
 const randomId = () =>
   Math.floor(Math.random() * 10e10).toString(36)
@@ -33,8 +33,8 @@ class Provider {
     }
     if (typeof parentTheme === 'string')
       parentTheme = [parentTheme]
-    parentTheme.forEach(name => {
-      resultData = merge(resultData, this.getThemeData(name))
+    parentTheme.forEach((parentThemeName) => {
+      resultData = merge(resultData, this.getThemeData(parentThemeName))
     })
     this.setThemeData(name, merge(resultData, themeData))
   }
@@ -54,5 +54,5 @@ class Provider {
 }
 
 export function create(options) {
-  return new ThemeProvider(options)
+  return new Provider(options)
 }

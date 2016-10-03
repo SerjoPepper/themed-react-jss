@@ -1,7 +1,7 @@
 import { Component, PropTypes } from 'react'
 import merge from 'lodash/merge'
 
-export function create (provider) {
+export function create(provider) {
   const { contextFieldName } = provider
 
   return class ApplyTheme extends Component {
@@ -27,7 +27,7 @@ export function create (provider) {
 
     themeContext = {}
 
-    getThemeData() {
+    buildThemeData() {
       const parent = this.context[contextFieldName]
       const { theme } = this.props
       const isOverride = theme && typeof theme !== 'string'
@@ -42,7 +42,7 @@ export function create (provider) {
     }
 
     getChildContext() {
-      this.themeContext.themeData = this.getThemeData()
+      this.themeContext.themeData = this.buildThemeData()
       return {
         [contextFieldName]: this.themeContext
       }
@@ -52,7 +52,11 @@ export function create (provider) {
       if (!watch)
         return
       if (theme !== this.props.theme)
-        this.themeContext.themeData = this.getThemeData()
+        this.themeContext.themeData = this.buildThemeData()
+    }
+
+    render() {
+      return this.props.children
     }
   }
 }
