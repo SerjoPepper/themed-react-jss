@@ -1,5 +1,5 @@
 {
-  "name": "react-jss-theme",
+  "name": "themed-react-jss",
   "version": "1.0.0",
   "description": "React JSS theme provider",
   "main": "lib/provider.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/SerjoPepper/react-jss-theme.git"
+    "url": "git+ssh://git@github.com/SerjoPepper/themed-react-jss.git"
   },
   "keywords": [
     "react",
@@ -21,9 +21,9 @@
   "author": "Sergey Pereskokov serjopepper@gmail.com",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SerjoPepper/react-jss-theme/issues"
+    "url": "https://github.com/SerjoPepper/themed-react-jss/issues"
   },
-  "homepage": "https://github.com/SerjoPepper/react-jss-theme#readme",
+  "homepage": "https://github.com/SerjoPepper/themed-react-jss#readme",
   "peerDependencies": {
     "react": "^15.0.0"
   },

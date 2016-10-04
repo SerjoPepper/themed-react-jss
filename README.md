@@ -3,14 +3,14 @@ This library helps you style your react components with JSS
 
 ## Install
 ```
-npm install --save react-jss-theme
+npm install --save themed-react-jss
 ```
 
 ## Usage
-```
+```js
 import React, { Component } from 'react'
 import { render } from 'react/lib/ReactDOM'
-import { create as createProvider } from 'react-jss-theme'
+import { create as createProvider } from 'themed-react-jss'
 
 const provider = createProvider()
 const { ApplyTheme, injectSheet, defineTheme, changeTheme } = provider
@@ -74,8 +74,8 @@ render((
 ```
 
 ### Provider options
-```
-import { create as createProvider } from 'react-jss-theme'
+```js
+import { create as createProvider } from 'themed-react-jss'
 
 const provider = createProvider({
   // name of context field, random generated string by default
@@ -86,8 +86,8 @@ const provider = createProvider({
 ```
 
 ### Define and change themes
-```
-import { create as createProvider } from 'react-jss-theme'
+```js
+import { create as createProvider } from 'themed-react-jss'
 const provider = createProvider()
 const { ApplyTheme, injectSheet, defineTheme, changeTheme } = provider
 
@@ -112,7 +112,7 @@ changeTheme('light', {
 ```
 
 ### injectSheet options
-```
+```js
 // This options passed to
 // jss.createStyleSheet(rules, options)
 // as options
@@ -128,7 +128,7 @@ class Buttons extends Component {
 
 ### Server-side rendering
 You can get your styles as a string with
-```
+```js
 provider.jss.sheets.toString()
 ```
 
