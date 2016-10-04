@@ -35,6 +35,7 @@
     import/no-unresolved: ["warn"]
     no-underscore-dangle: ["off"]
     import/prefer-default-export: ["off"]
+    import/no-extraneous-dependencies: ["error", {"devDependencies": ["**/test/**/*.js"]}]
   globals:
     __DEV__: true
     __PRODUCTION__: true

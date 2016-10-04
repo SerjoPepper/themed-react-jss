@@ -61,7 +61,7 @@ export function create(provider) {
         }
 
         get sheet() {
-          return sheets[this.getThemeData()].sheet
+          return sheets.get(this.getThemeData()).sheet
         }
 
         getThemeData(context = this.context) {

@@ -10,7 +10,12 @@ export function create(provider) {
       /**
        * Theme. Can be key or object with theme overrides
        */
-      theme: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+      name: PropTypes.string,
+      /**
+       * Override some values
+       * @type {[type]}
+       */
+      override: PropTypes.object,
       /**
        * Indicate watch on theme or not
        */
@@ -29,16 +34,20 @@ export function create(provider) {
 
     buildThemeData() {
       const parent = this.context[contextFieldName]
-      const { theme } = this.props
-      const isOverride = theme && typeof theme !== 'string'
+      const { name, override = {} } = this.props
+      let data
       if (!parent) {
-        if (isOverride)
-          return theme
-        return provider.getThemeData(theme)
+        data = name ? provider.getThemeData(name) : provider.getDefaultThemeData()
+        if (override)
+          data = merge({}, data, override)
+      } else {
+        data = parent.themeData
+        if (name)
+          data = merge({}, data, provider.getThemeData(name))
+        if (override)
+          data = merge({}, data, override)
       }
-      if (isOverride)
-        return merge({}, parent.themeData, theme)
-      return merge({}, parent.themeData, provider.getThemeData(theme))
+      return data
     }
 
     getChildContext() {

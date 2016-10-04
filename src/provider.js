@@ -13,11 +13,11 @@ const randomId = () =>
 class Provider {
   /**
    * Constructor
-   * @param  {Object} options - Options
-   * @param  {Object} options.jss - Jss Object
-   * @param  {String} options.contextFieldName - Property name for context
+   * @param  {Object} [options] - Options
+   * @param  {Object} [options.jss] - Jss Object
+   * @param  {String} [options.contextFieldName] - Property name for context
    */
-  constructor(options) {
+  constructor(options = {}) {
     this.contextFieldName = options.contextFieldName || `themeProvider_${randomId()}`
     this.jss = options.jss || createJss(preset())
     this.ApplyTheme = createApplyTheme(this)
@@ -25,21 +25,21 @@ class Provider {
     this.themes = {}
   }
 
-  defineTheme(name, parentTheme, themeData) {
+  defineTheme(name, themeData, options = {}) {
     let resultData = {}
-    if (!themeData) {
-      themeData = parentTheme
-      parentTheme = undefined
-    }
-    if (typeof parentTheme === 'string')
-      parentTheme = [parentTheme]
-    parentTheme.forEach((parentThemeName) => {
+    let { inherit = [] } = options
+    const { isDefault = false } = options
+    if (typeof inherit === 'string')
+      inherit = [inherit]
+    inherit.forEach((parentThemeName) => {
       resultData = merge(resultData, this.getThemeData(parentThemeName))
     })
     this.setThemeData(name, merge(resultData, themeData))
+    if (isDefault)
+      this.defaultThemeName = name
   }
 
-  extendTheme(name, themeData) {
+  changeTheme(name, themeData) {
     this.setThemeData(name, merge({}, this.getThemeData(name), themeData))
   }
 
@@ -48,7 +48,11 @@ class Provider {
   }
 
   getThemeData(name) {
-    return this.themes[name]
+    return this.themes[name] || {}
+  }
+
+  getDefaultThemeData() {
+    return this.getThemeData(this.defaultThemeName)
   }
 
 }
