@@ -30,11 +30,9 @@ export function create(provider) {
       [contextFieldName]: PropTypes.object
     }
 
-    themeContext = {}
-
     buildThemeData() {
       const parent = this.context[contextFieldName]
-      const { name, override = {} } = this.props
+      const { name, override } = this.props
       let data
       if (!parent) {
         data = name ? provider.getThemeData(name) : provider.getDefaultThemeData()
@@ -51,17 +49,11 @@ export function create(provider) {
     }
 
     getChildContext() {
-      this.themeContext.themeData = this.buildThemeData()
+      if (this.props.watch || !this.themeData)
+        this.themeData = this.buildThemeData()
       return {
-        [contextFieldName]: this.themeContext
+        [contextFieldName]: this.themeData
       }
-    }
-
-    componentWillUpdate({ watch, theme }) {
-      if (!watch)
-        return
-      if (theme !== this.props.theme)
-        this.themeContext.themeData = this.buildThemeData()
     }
 
     render() {

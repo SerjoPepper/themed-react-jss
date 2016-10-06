@@ -44,7 +44,7 @@ export function create(provider) {
       }
 
       const emptyThemeData = {}
-      const sheets = new WeakMap()
+      const sheets = new Map()
       const displayName =
         WrappedComponent.displayName ||
         WrappedComponent.name ||
@@ -65,8 +65,7 @@ export function create(provider) {
         }
 
         getThemeData(context = this.context) {
-          const { themeData = emptyThemeData } = (context[contextFieldName] || {})
-          return themeData
+          return context[contextFieldName] || emptyThemeData
         }
 
         componentWillMount() {

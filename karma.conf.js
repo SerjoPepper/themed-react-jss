@@ -3,7 +3,7 @@ module.exports = function (config) {
     basePath: '',
     frameworks: ['jasmine'],
     files: [
-      'test/**/*.js'
+      'test/index.js'
     ],
 
     preprocessors: {
