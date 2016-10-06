@@ -39,7 +39,7 @@ export function create(provider) {
         if (override)
           data = merge({}, data, override)
       } else {
-        data = parent.themeData
+        data = parent
         if (name)
           data = merge({}, data, provider.getThemeData(name))
         if (override)
