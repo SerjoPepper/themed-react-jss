@@ -90,8 +90,7 @@ export function create(provider) {
         render() {
           return <WrappedComponent { ...this.props }
             sheet={ this.sheet }
-            theme={ this.getThemeData() }
-            themeProvider={ provider } />
+            theme={ this.getThemeData() } />
         }
       }
 
