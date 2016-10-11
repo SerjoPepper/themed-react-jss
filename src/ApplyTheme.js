@@ -39,7 +39,7 @@ export function create(provider) {
         if (override)
           data = merge({}, data, override)
       } else {
-        data = parent
+        data = parent.themeData
         if (name)
           data = merge({}, data, provider.getThemeData(name))
         if (override)
@@ -52,7 +52,10 @@ export function create(provider) {
       if (this.props.watch || !this.themeData)
         this.themeData = this.buildThemeData()
       return {
-        [contextFieldName]: this.themeData
+        [contextFieldName]: {
+          provider,
+          themeData: this.themeData
+        }
       }
     }
 

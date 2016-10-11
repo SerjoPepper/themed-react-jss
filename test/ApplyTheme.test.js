@@ -7,8 +7,8 @@ const provider = createProvider()
 const { ApplyTheme, injectSheet, jss } = provider
 class RawComponent extends Component {
   render() {
-    const { sheet: { classes } } = this.props
-    return <div className={ classes.baseDiv }>hello</div>
+    const { sheet: { classes }, theme } = this.props
+    return <div className={ classes.baseDiv } style={{ width: theme.size.width }}>hello</div>
   }
 }
 const StyledComponent = injectSheet(theme => ({
@@ -24,7 +24,8 @@ provider.defineTheme('foo', {
     accent: 'rgb(0, 0, 0)'
   },
   size: {
-    height: '20px'
+    height: '20px',
+    width: '100px'
   }
 }, {
   isDefault: true
@@ -73,6 +74,7 @@ describe('ApplyTheme test', () => {
       <ApplyTheme name="foo"><StyledComponent/></ApplyTheme>
     )
     expect(styles.height).toEqual('20px')
+    expect(styles.width).toEqual('100px')
     expect(styles.color).toEqual('rgb(0, 0, 0)')
   })
 
@@ -81,6 +83,7 @@ describe('ApplyTheme test', () => {
       <ApplyTheme><StyledComponent/></ApplyTheme>
     )
     expect(styles.height).toEqual('20px')
+    expect(styles.width).toEqual('100px')
     expect(styles.color).toEqual('rgb(0, 0, 0)')
   })
 
@@ -89,6 +92,7 @@ describe('ApplyTheme test', () => {
       <ApplyTheme name="fooChild"><StyledComponent/></ApplyTheme>
     )
     expect(styles.height).toEqual('10px')
+    expect(styles.width).toEqual('100px')
     expect(styles.color).toEqual('rgb(0, 0, 0)')
   })
 
@@ -99,6 +103,7 @@ describe('ApplyTheme test', () => {
       </ApplyTheme>
     )
     expect(styles.height).toEqual('20px')
+    expect(styles.width).toEqual('100px')
     expect(styles.color).toEqual('rgb(0, 128, 0)')
   })
 
@@ -111,6 +116,7 @@ describe('ApplyTheme test', () => {
       </ApplyTheme>
     )
     expect(styles.height).toEqual('5px')
+    expect(styles.width).toEqual('100px')
     expect(styles.color).toEqual('rgb(255, 0, 0)')
   })
 

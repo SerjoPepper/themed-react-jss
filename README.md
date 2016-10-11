@@ -36,7 +36,10 @@ provider.defineTheme('otherTheme', {
 
 class RawButton extends Component {
   render() {
-    return <button className={ this.props.sheet.classes.button }>hello</button>
+    const { sheet, theme } = this.props
+    return <button 
+      className={ sheet.classes.button } 
+      style={{ fontSize: theme.sizes.font }}>hello</button>
   }
 }
 
@@ -54,9 +57,7 @@ const StyledButton = injectSheet(theme => ({
 
 // Usage
 render((
-  <ApplyTheme name="myTheme">
-    <StyledButton/>
-  </ApplyTheme>
+  <ApplyTheme name='myTheme'><StyledButton/></ApplyTheme>
 ), document.body)
 
 // Usage with overrides and defaultThemes

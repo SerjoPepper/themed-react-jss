@@ -65,7 +65,9 @@ export function create(provider) {
         }
 
         getThemeData(context = this.context) {
-          return context[contextFieldName] || emptyThemeData
+          return context[contextFieldName] ?
+            context[contextFieldName].themeData :
+            emptyThemeData
         }
 
         componentWillMount() {
@@ -86,7 +88,10 @@ export function create(provider) {
         }
 
         render() {
-          return <WrappedComponent { ...this.props } sheet={ this.sheet } />
+          return <WrappedComponent { ...this.props }
+            sheet={ this.sheet }
+            theme={ this.getThemeData() }
+            themeProvider={ provider } />
         }
       }
 
