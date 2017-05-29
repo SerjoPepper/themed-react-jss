@@ -1,25 +1,22 @@
-import { Component, PropTypes } from 'react'
+import { Component } from 'react'
+import PropTypes from 'prop-types'
 import merge from 'lodash/merge'
+import isEqual from 'lodash/isEqual'
 
 export function create(provider) {
-  const { contextFieldName } = provider
+  const { contextFieldName, createDefaultJss } = provider
 
   return class ApplyTheme extends Component {
 
     static propTypes = {
       /**
-       * Theme. Can be key or object with theme overrides
+       * Theme object
        */
-      name: PropTypes.string,
+      theme: PropTypes.object,
       /**
-       * Override some values
-       * @type {[type]}
+       * Jss object
        */
-      override: PropTypes.object,
-      /**
-       * Indicate watch on theme or not
-       */
-      watch: PropTypes.bool
+      jss: PropTypes.object
     }
 
     static contextTypes = {
@@ -30,31 +27,36 @@ export function create(provider) {
       [contextFieldName]: PropTypes.object
     }
 
-    buildThemeData() {
-      const parent = this.context[contextFieldName]
-      const { name, override } = this.props
-      let data
-      if (!parent) {
-        data = name ? provider.getThemeData(name) : provider.getDefaultThemeData()
-        if (override)
-          data = merge({}, data, override)
-      } else {
-        data = parent.themeData
-        if (name)
-          data = merge({}, data, provider.getThemeData(name))
-        if (override)
-          data = merge({}, data, override)
-      }
-      return data
+    getJSS() {
+      if (this.jss)
+        return this.jss
+      const ctx = this.context[contextFieldName]
+      this.jss = ctx && ctx.jss
+      if (!this.jss)
+        this.jss = this.props.jss || createDefaultJss()
+      return this.jss
+    }
+
+    getResultTheme() {
+      const ctx = this.context[contextFieldName]
+      const parentTheme = ctx && ctx.theme
+      const propsTheme = this.props.theme
+
+      if (this.resultTheme && parentTheme === this.parentTheme && (propsTheme === this.propsTheme || isEqual(propsTheme, this.propsTheme)))
+        return this.resultTheme
+
+      this.resultTheme = merge({}, parentTheme, propsTheme)
+      this.propsTheme = propsTheme
+      this.parentTheme = parentTheme
+      return this.resultTheme
     }
 
     getChildContext() {
-      if (this.props.watch || !this.themeData)
-        this.themeData = this.buildThemeData()
       return {
         [contextFieldName]: {
           provider,
-          themeData: this.themeData
+          jss: this.getJSS(),
+          theme: this.getResultTheme()
         }
       }
     }
