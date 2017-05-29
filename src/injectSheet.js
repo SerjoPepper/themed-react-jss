@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import hoistNonReactStatics from 'hoist-non-react-statics'
 
 export function create(provider) {
@@ -12,15 +13,15 @@ export function create(provider) {
       return styles
     }
 
-    function createSheet(themeData) {
-      return provider.jss.createStyleSheet(getResultStyles(themeData), jssOptions)
+    function createSheet(theme, jss) {
+      return jss.createStyleSheet(getResultStyles(theme), jssOptions)
     }
 
     return function decorate(WrappedComponent) {
 
-      function attachSheetOnce(themeData) {
-        if (sheets.has(themeData)) {
-          const info = sheets.get(themeData)
+      function attachSheetOnce(theme, jss) {
+        if (sheets.has(theme)) {
+          const info = sheets.get(theme)
           if (!info.refs) {
             info.refs = 1
             info.sheet.attach()
@@ -30,20 +31,19 @@ export function create(provider) {
         } else {
           const info = {}
           info.refs = 1
-          info.sheet = createSheet(themeData)
+          info.sheet = createSheet(theme, jss)
           info.sheet.attach()
-          sheets.set(themeData, info)
+          sheets.set(theme, info)
         }
       }
 
-      function detachSheetOnce(themeData) {
-        const info = sheets.get(themeData)
+      function detachSheetOnce(theme) {
+        const info = sheets.get(theme)
         info.refs -= 1
         if (!info.refs)
           info.sheet.detach()
       }
 
-      const emptyThemeData = {}
       const sheets = new Map()
       const displayName =
         WrappedComponent.displayName ||
@@ -64,14 +64,16 @@ export function create(provider) {
           return sheets.get(this.getThemeData()).sheet
         }
 
+        getJss(context = this.context) {
+          return context[contextFieldName].jss
+        }
+
         getThemeData(context = this.context) {
-          return context[contextFieldName] ?
-            context[contextFieldName].themeData :
-            emptyThemeData
+          return context[contextFieldName].theme
         }
 
         componentWillMount() {
-          attachSheetOnce(this.getThemeData())
+          attachSheetOnce(this.getThemeData(), this.getJss())
         }
 
         componentWillUnmount() {
@@ -84,7 +86,7 @@ export function create(provider) {
           if (themeData === nextThemeData)
             return
           detachSheetOnce(themeData)
-          attachSheetOnce(nextThemeData)
+          attachSheetOnce(nextThemeData, this.getJss())
         }
 
         render() {

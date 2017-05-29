@@ -1,6 +1,6 @@
 {
   "name": "themed-react-jss",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "React JSS theme provider",
   "main": "lib/provider.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "babel-preset-react": "^6.16.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-runtime": "^6.11.6",
-    "enzyme": "^2.4.1",
+    "enzyme": "^2.8.2",
     "eslint": "^3.7.0",
     "eslint-config-airbnb-base": "^8.0.0",
     "eslint-plugin-babel": "^3.2.0",
@@ -52,13 +52,14 @@
     "karma-webpack": "^1.8.0",
     "react": "^15.0.0",
     "react-addons-test-utils": "^15.3.2",
-    "react-dom": "^15.3.2",
+    "react-dom": "^15.5.4",
     "webpack": "^1.13.2"
   },
   "dependencies": {
     "hoist-non-react-statics": "^1.2.0",
     "jss": "^5.5.5",
     "jss-preset-default": "^0.5.0",
-    "lodash": "^4.16.2"
+    "lodash": "^4.16.2",
+    "prop-types": "^15.5.10"
   }
 }

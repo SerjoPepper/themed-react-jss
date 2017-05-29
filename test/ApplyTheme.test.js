@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { mount } from 'enzyme'
-import { findDOMNode } from 'react/lib/ReactDOM'
-import { create as createProvider } from '../src/provider'
+import { findDOMNode } from 'react-dom'
+import { createProvider, createJss } from '../src/provider'
 
 const provider = createProvider()
-const { ApplyTheme, injectSheet, jss } = provider
+const { ApplyTheme, injectSheet } = provider
 class RawComponent extends Component {
   render() {
     const { sheet: { classes }, theme } = this.props
@@ -19,7 +19,7 @@ const StyledComponent = injectSheet(theme => ({
   }
 }))(RawComponent)
 
-provider.defineTheme('foo', {
+const themeFoo = {
   palette: {
     accent: 'rgb(0, 0, 0)'
   },
@@ -27,26 +27,24 @@ provider.defineTheme('foo', {
     height: '20px',
     width: '100px'
   }
-}, {
-  isDefault: true
-})
+}
 
-provider.defineTheme('fooChild', {
+const themeFooChild = {
+  ...themeFoo,
   size: {
+    ...themeFoo.size,
     height: '10px'
   }
-}, {
-  inherit: ['foo']
-})
+}
 
-provider.defineTheme('bar', {
+const themeBar = {
   size: {
     height: '5px'
   },
   palette: {
     accent: 'rgb(255, 0, 0)'
   }
-})
+}
 
 
 describe('ApplyTheme test', () => {
@@ -71,16 +69,7 @@ describe('ApplyTheme test', () => {
 
   it('Theme "foo" is applied', () => {
     const styles = getStyles(
-      <ApplyTheme name="foo"><StyledComponent/></ApplyTheme>
-    )
-    expect(styles.height).toEqual('20px')
-    expect(styles.width).toEqual('100px')
-    expect(styles.color).toEqual('rgb(0, 0, 0)')
-  })
-
-  it('Default theme is applied', () => {
-    const styles = getStyles(
-      <ApplyTheme><StyledComponent/></ApplyTheme>
+      <ApplyTheme theme={themeFoo}><StyledComponent/></ApplyTheme>
     )
     expect(styles.height).toEqual('20px')
     expect(styles.width).toEqual('100px')
@@ -89,7 +78,7 @@ describe('ApplyTheme test', () => {
 
   it('Inherited theme applied', () => {
     const styles = getStyles(
-      <ApplyTheme name="fooChild"><StyledComponent/></ApplyTheme>
+      <ApplyTheme theme={themeFooChild}><StyledComponent/></ApplyTheme>
     )
     expect(styles.height).toEqual('10px')
     expect(styles.width).toEqual('100px')
@@ -98,8 +87,10 @@ describe('ApplyTheme test', () => {
 
   it('Override theme values', () => {
     const styles = getStyles(
-      <ApplyTheme name="foo" override={{ palette: { accent: 'rgb(0, 128, 0)' } }}>
-        <StyledComponent/>
+      <ApplyTheme theme={themeFoo}>
+        <ApplyTheme theme={{ palette: { accent: 'rgb(0, 128, 0)' } }}>
+          <StyledComponent/>
+        </ApplyTheme>
       </ApplyTheme>
     )
     expect(styles.height).toEqual('20px')
@@ -109,8 +100,8 @@ describe('ApplyTheme test', () => {
 
   it('Apply multiple themes', () => {
     const styles = getStyles(
-      <ApplyTheme name="foo">
-        <ApplyTheme name="bar">
+      <ApplyTheme theme={themeFoo}>
+        <ApplyTheme theme={themeBar}>
           <StyledComponent/>
         </ApplyTheme>
       </ApplyTheme>
@@ -121,6 +112,13 @@ describe('ApplyTheme test', () => {
   })
 
   it('Jss renders to string', () => {
+    const jss = createJss()
+    mount(
+      <ApplyTheme theme={themeFooChild} jss={jss}>
+        <StyledComponent/>
+      </ApplyTheme>,
+      { attachTo: container }
+    )
     expect(jss.sheets.toString().length > 0).toBe(true)
   })
 })

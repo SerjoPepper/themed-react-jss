@@ -10,12 +10,12 @@ npm install --save themed-react-jss
 ```js
 import React, { Component } from 'react'
 import { render } from 'react/lib/ReactDOM'
-import { create as createProvider } from 'themed-react-jss'
+import { createProvider } from 'themed-react-jss'
 
 const provider = createProvider()
-const { ApplyTheme, injectSheet, defineTheme, changeTheme } = provider
+const { ApplyTheme } = provider
 
-provider.defineTheme('myTheme', {
+const myTheme = {
   sizes: {
     padding: '10px',
     font: '16px'
@@ -24,15 +24,13 @@ provider.defineTheme('myTheme', {
     font: '#000',
     background: '#eee'
   }
-}, { isDefault: true })
+}
 
-provider.defineTheme('otherTheme', {
+const otherTheme = {
   sizes: {
     font: '18px'
   }
-}, {
-  inherit: ['myTheme']
-})
+}
 
 class RawButton extends Component {
   render() {
@@ -57,16 +55,17 @@ const StyledButton = injectSheet(theme => ({
 
 // Usage
 render((
-  <ApplyTheme name='myTheme'><StyledButton/></ApplyTheme>
+  <ApplyTheme theme={myTheme}><StyledButton/></ApplyTheme>
 ), document.body)
 
-// Usage with overrides and defaultThemes
+// Usage with overrides and customJss
+
 render((
-  <ApplyTheme>
-    <ApplyTheme name="otherTheme">
+  <ApplyTheme theme={myTheme} jss={createJss()}>
+    <ApplyTheme theme={otherTheme}>
       <StyledButton/>
     </ApplyTheme>
-    <ApplyTheme override={{ palette: { font: 'green' } }}>
+    <ApplyTheme theme={{ palette: { font: 'green' } }}>
       <StyledButton/>
     </ApplyTheme>
   </ApplyTheme>
@@ -76,39 +75,11 @@ render((
 
 ### Provider options
 ```js
-import { create as createProvider } from 'themed-react-jss'
+import { createProvider } from 'themed-react-jss'
 
 const provider = createProvider({
   // name of context field, random generated string by default
-  contextFieldName: 'MyThemeProvider',
-  // instance of JSS
-  jss: createJss()
-})
-```
-
-### Define and change themes
-```js
-import { create as createProvider } from 'themed-react-jss'
-const provider = createProvider()
-const { ApplyTheme, injectSheet, defineTheme, changeTheme } = provider
-
-defineTheme('light', {
-  size: '20px',
-  color: '#fff'
-})
-
-defineTheme('dark', {
-  color: '#000'
-}, {
-  // parent themes
-  inherit: ['light'],
-  // Default theme or not
-  isDefault: true
-})
-
-// change defined theme
-changeTheme('light', {
-  size: '10px'
+  contextFieldName: 'MyThemeProvider'
 })
 ```
 
@@ -130,6 +101,17 @@ class Buttons extends Component {
 ### Server-side rendering
 You can get your styles as a string with
 ```js
-provider.jss.sheets.toString()
+import React, { Component } from 'react'
+import { render } from 'react/lib/ReactDOM'
+import { createProvider, createJss } from 'themed-react-jss'
+
+const jss = createJss()
+render((
+  <ApplyTheme theme={myTheme} jss={jss}>
+    <StyledButton/>
+  </ApplyTheme>
+))
+
+const resultCssString = jss.sheets.toString()
 ```
 
