@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import PropTypes from 'prop-types'
 import merge from 'lodash/merge'
+import EventEmitter from 'events'
 import isEqual from 'lodash/isEqual'
 
 export function create(provider) {
@@ -27,6 +28,16 @@ export function create(provider) {
       [contextFieldName]: PropTypes.object
     }
 
+    constructor(props) {
+      super(props)
+      this.events = new EventEmitter()
+      this.events.setMaxListeners(0)
+    }
+
+    componentWillUnmount() {
+      this.events.removeAllListeners()
+    }
+
     getJSS() {
       if (this.jss)
         return this.jss
@@ -37,10 +48,10 @@ export function create(provider) {
       return this.jss
     }
 
-    getResultTheme() {
-      const ctx = this.context[contextFieldName]
+    getResultTheme(props = this.props, context = this.context) {
+      const ctx = context[contextFieldName]
       const parentTheme = ctx && ctx.theme
-      const propsTheme = this.props.theme
+      const propsTheme = props.theme
 
       if (this.resultTheme && parentTheme === this.parentTheme && (propsTheme === this.propsTheme || isEqual(propsTheme, this.propsTheme)))
         return this.resultTheme
@@ -55,10 +66,16 @@ export function create(provider) {
       return {
         [contextFieldName]: {
           provider,
+          events: this.events,
           jss: this.getJSS(),
           theme: this.getResultTheme()
         }
       }
+    }
+
+    componentWillUpdate(nextProps, nextState, nextContext) {
+      if (this.resultTheme !== this.getResultTheme(nextProps, nextContext))
+        this.events.emit('update', this.resultTheme)
     }
 
     render() {

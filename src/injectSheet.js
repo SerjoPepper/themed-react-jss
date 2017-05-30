@@ -61,38 +61,37 @@ export function create(provider) {
         }
 
         get sheet() {
-          return sheets.get(this.getThemeData()).sheet
+          return sheets.get(this.themeData).sheet
         }
 
-        getJss(context = this.context) {
-          return context[contextFieldName].jss
+        get jss() {
+          return this.context[contextFieldName].jss
         }
 
-        getThemeData(context = this.context) {
-          return context[contextFieldName].theme
-        }
+        onThemeUpdate = (nextThemeData) => {
+          if (this.themeData === nextThemeData)
+            return
+          attachSheetOnce(nextThemeData, this.jss)
+          detachSheetOnce(this.themeData)
+          this.themeData = nextThemeData
+          this.forceUpdate()
+        };
 
         componentWillMount() {
-          attachSheetOnce(this.getThemeData(), this.getJss())
+          this.themeData = this.context[contextFieldName].theme
+          attachSheetOnce(this.themeData, this.jss)
+          this.context[contextFieldName].events.on('update', this.onThemeUpdate)
         }
 
         componentWillUnmount() {
-          detachSheetOnce(this.getThemeData())
-        }
-
-        componentWillUpdate(nextProps, nextState, nextContext) {
-          const themeData = this.getThemeData()
-          const nextThemeData = this.getThemeData(nextContext)
-          if (themeData === nextThemeData)
-            return
-          detachSheetOnce(themeData)
-          attachSheetOnce(nextThemeData, this.getJss())
+          detachSheetOnce(this.themeData)
+          this.context[contextFieldName].events.removeListener('update', this.onThemeUpdate)
         }
 
         render() {
           return <WrappedComponent { ...this.props }
             sheet={ this.sheet }
-            theme={ this.getThemeData() } />
+            theme={ this.themeData } />
         }
       }
 
