@@ -34,7 +34,21 @@ export function create(provider) {
       this.events.setMaxListeners(0)
     }
 
+    onParentUpdate = (parentTheme) => {
+      if (this.resultTheme !== this.getResultTheme(this.props.theme, parentTheme))
+        this.events.emit('update', this.resultTheme)
+    };
+
+    componentWillMount() {
+      const ctx = this.context[contextFieldName]
+      if (ctx)
+        ctx.events.on('update', this.onParentUpdate)
+    }
+
     componentWillUnmount() {
+      const ctx = this.context[contextFieldName]
+      if (ctx)
+        ctx.events.removeListener('update', this.onParentUpdate)
       this.events.removeAllListeners()
     }
 
@@ -48,12 +62,13 @@ export function create(provider) {
       return this.jss
     }
 
-    getResultTheme(props = this.props, context = this.context) {
+    getParentTheme(context = this.context) {
       const ctx = context[contextFieldName]
-      const parentTheme = ctx && ctx.theme
-      const propsTheme = props.theme
+      return ctx ? ctx.theme : null
+    }
 
-      if (this.resultTheme && parentTheme === this.parentTheme && (propsTheme === this.propsTheme || isEqual(propsTheme, this.propsTheme)))
+    getResultTheme(propsTheme, parentTheme) {
+      if (this.resultTheme && (parentTheme === this.parentTheme) && isEqual(propsTheme, this.propsTheme))
         return this.resultTheme
 
       this.resultTheme = merge({}, parentTheme, propsTheme)
@@ -68,13 +83,13 @@ export function create(provider) {
           provider,
           events: this.events,
           jss: this.getJSS(),
-          theme: this.getResultTheme()
+          theme: this.getResultTheme(this.props.theme, this.getParentTheme())
         }
       }
     }
 
     componentWillUpdate(nextProps, nextState, nextContext) {
-      if (this.resultTheme !== this.getResultTheme(nextProps, nextContext))
+      if (this.resultTheme !== this.getResultTheme(nextProps.theme, this.getParentTheme(nextContext)))
         this.events.emit('update', this.resultTheme)
     }
 
